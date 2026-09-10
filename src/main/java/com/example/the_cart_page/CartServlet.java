@@ -52,37 +52,35 @@ public class CartServlet extends HttpServlet {
         String action = request.getParameter("action");
         String id = request.getParameter("id");
 
-        if ("add".equals(action)) {
-            String description = request.getParameter("description");
-            double price = Double.parseDouble(request.getParameter("price"));
-            CartItem foundItem = findItem(cart, id);
+        if (action != null) {
+            if (action.equals("add")) {
+                String description = request.getParameter("description");
+                double price = Double.parseDouble(request.getParameter("price"));
+                CartItem foundItem = findItem(cart, id);
 
-            if (foundItem == null) {
-                cart.add(new CartItem(id, description, price, 1));
-            } else {
-                foundItem.setQuantity(foundItem.getQuantity() + 1);
-            }
+                if (foundItem == null) {
+                    cart.add(new CartItem(id, description, price, 1));
+                } else {
+                    foundItem.setQuantity(foundItem.getQuantity() + 1);
+                }
 
-            Cookie lastAddedCookie = new Cookie("lastAddedId", id);
-            lastAddedCookie.setMaxAge(60 * 60 * 24 * 7);
-            lastAddedCookie.setPath(request.getContextPath());
-            response.addCookie(lastAddedCookie);
-        }
+                Cookie lastAddedCookie = new Cookie("lastAddedId", id);
+                lastAddedCookie.setMaxAge(60 * 60 * 24 * 7);
+                lastAddedCookie.setPath(request.getContextPath());
+                response.addCookie(lastAddedCookie);
+            } else if (action.equals("update")) {
+                int quantity = Integer.parseInt(request.getParameter("quantity"));
+                CartItem foundItem = findItem(cart, id);
 
-        if ("update".equals(action)) {
-            int quantity = Integer.parseInt(request.getParameter("quantity"));
-            CartItem foundItem = findItem(cart, id);
+                if (foundItem != null && quantity > 0) {
+                    foundItem.setQuantity(quantity);
+                }
+            } else if (action.equals("remove")) {
+                CartItem foundItem = findItem(cart, id);
 
-            if (foundItem != null && quantity > 0) {
-                foundItem.setQuantity(quantity);
-            }
-        }
-
-        if ("remove".equals(action)) {
-            CartItem foundItem = findItem(cart, id);
-
-            if (foundItem != null) {
-                cart.remove(foundItem);
+                if (foundItem != null) {
+                    cart.remove(foundItem);
+                }
             }
         }
 
